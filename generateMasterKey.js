@@ -1,16 +1,27 @@
-#! /usr/bin/env node
-'use strict';
+// #! /usr/bin/env node
+// 'use strict';
 
-import CryptoJS from 'crypto-js';
+var CryptoJS = require('crypto-js');
 
+const KEY_SIZE_IN_BITS = 512;
+const PBKDF2_ITERATIONS = 100203;
 
-var salt = CryptoJS.lib.WordArray.random()
-var salt = CryptoJS.lib.WordArray.random(512 / 8);
+export function deriveMasterKey(password = 'development'){
+    const salt = CryptoJS.lib.WordArray.random(KEY_SIZE_IN_BITS / 8); // Creating a 512 bit/ 64 bytes salt (Salt size is ideally equal to keysize)
+    
+    const masterKey = CryptoJS.PBKDF2(password, salt, {
+        keySize: KEY_SIZE_IN_BITS / 32, // keySize is the size of the key in 4-byte blocks
+        iterations: PBKDF2_ITERATIONS
+    });
+    console.log(masterKey.toString());
+    return {
+        masterKey,
+        salt,
+    }
+}
 
-var key512Bits1000Iterations = CryptoJS.PBKDF2("Secret Passphrase", salt, {
-  keySize: 512 / 32,
-  iterations: 100117
-});
+console.log(deriveMasterKey());
+
 
 /**
  * CryptoJS extensions for PBKDF2
@@ -58,8 +69,8 @@ CryptoJS.kdf.PBKDF2 = {
      */
     execute: function (password, keySize, ivSize, salt) {
         // Generate random salt
-        if (! salt) {
-            salt = CryptoJS.lib.WordArray.random(128/8);
+        if (!salt) {
+            salt = CryptoJS.lib.WordArray.random(128 / 8);
         }
 
         // Derive key and IV
@@ -94,7 +105,7 @@ CryptoJS.format.JSON = {
         var salt = cipherParams.salt;
         var obj = { ciphertext: ciphertext.toString(CryptoJS.enc.Base64) };
 
-        if(salt){
+        if (salt) {
             obj.salt = salt.toString(CryptoJS.enc.Base64);
         }
 
@@ -119,7 +130,7 @@ CryptoJS.format.JSON = {
         var salt;
         var ciphertext = CryptoJS.enc.Base64.parse(obj.ciphertext);
 
-        if(obj.salt){
+        if (obj.salt) {
             salt = CryptoJS.enc.Base64.parse(obj.salt);
         }
 
@@ -146,7 +157,7 @@ CryptoJS.format.Base64URL = {
         var ciphertext = cipherParams.ciphertext;
         var salt = cipherParams.salt;
 
-        if(salt){
+        if (salt) {
             var wordArray = CryptoJS.lib.WordArray.create([0x4272696e, 0x65645f5f, salt.words.length]).concat(salt).concat(ciphertext);
         } else {
             var wordArray = ciphertext;
@@ -171,21 +182,21 @@ CryptoJS.format.Base64URL = {
     parse: function (b64Str) {
         // Parse base64
         var ciphertext = CryptoJS.enc.Base64URL.parse(b64Str);
-        
-         // Shortcut
+
+        // Shortcut
         var ciphertextWords = ciphertext.words;
-        
+
         if (ciphertextWords[0] == 0x4272696e && ciphertextWords[1] == 0x65645f5f) {
             // Extract salt length
             var saltEnd = 3 + ciphertextWords[2];
             // Extract salt
             var salt = CryptoJS.lib.WordArray.create(ciphertextWords.slice(3, saltEnd));
-            
+
             // Remove salt from ciphertext
             ciphertextWords.splice(0, saltEnd);
             ciphertext.sigBytes -= (4 * saltEnd);
         }
-        
+
         return CryptoJS.lib.CipherParams.create({ ciphertext: ciphertext, salt: salt });
     }
 }
