@@ -8,10 +8,10 @@ const MAX_UINT32 = Math.pow(2, 32) - 1;
 
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
 const UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const SPECAIL_CASE = "$#@!%^&*()+-,/:;<>[]_~|{}`'?";
+const SPECIAL_CASE = "$#@!%^&*()+-,/:;<>[]_~|{}`'?";
 const DIGITS = "0123456789";
 
-const REQUIRED_CHARACTER_SETS = [LOWER_CASE, UPPER_CASE, DIGITS, SPECAIL_CASE];
+const REQUIRED_CHARACTER_SETS = [LOWER_CASE, UPPER_CASE, DIGITS, SPECIAL_CASE];
 
 export const passwordGenerator = {
 
@@ -20,17 +20,37 @@ export const passwordGenerator = {
      * If provided length is -1, then randomly generates password having length in range [8,15]
      * 
      * @param {number} [length=DEFAULT_PASSWORD_LENGTH] The length of the password to generate.
+     * @param {number} [minLengthLower=1] Minimum number of lowercase characters the password should have
+     * @param {number} [minLengthUpper=1] Minimum number of uppercase characters the password should have
+     * @param {number} [minLengthDigit=1] Minimum number of digits the password should have
+     * @param {number} [minLengthSpecial=1] Minimum number of special characters the password should have
      * 
      * @returns {string} password that was generated.
      * 
      * @throws Error if `length` is invalid
-     * @throws Error if `lengthLower` + `lengthUpper` + `lengthDigit` != `length`
+     * @throws Error if `minLengthLower` + `minLengthUpper` + `minLengthDigit` + `minLengthSpecial` > `length`
      * 
      * @see https://stackoverflow.com/a/5361965
      * 
      * 
      */
-    generatePassword(length = DEFAULT_PASSWORD_LENGTH) {
+    generatePassword(
+        length = DEFAULT_PASSWORD_LENGTH,
+        minLengthLower = 1,
+        minLengthUpper = 1,
+        minLengthDigit = 1,
+        minLengthSpecial = 1
+    ) {
+
+        // If negative than take 0
+        minLengthLower = Math.max(0, minLengthLower);
+        minLengthUpper = Math.max(0, minLengthUpper);
+        minLengthDigit = Math.max(0, minLengthDigit);
+        minLengthSpecial = Math.max(0, minLengthSpecial);
+
+        if (minLengthLower + minLengthUpper + minLengthDigit + minLengthSpecial > length) {
+            throw new Error('minLengthLower + minLengthUpper + minLengthDigit + minLengthSpecial should be less than length')
+        }
 
         if (length === -1) {
             length = DEFAULT_PASSWORD_MIN_LENGTH + this._randomIndex(DEFAULT_PASSWORD_LENGTH - DEFAULT_PASSWORD_MIN_LENGTH + 1)
@@ -39,23 +59,25 @@ export const passwordGenerator = {
         if (length < DEFAULT_PASSWORD_MIN_LENGTH) {
             throw new Error("requested password length is too short");
         }
-
         if (length > MAX_UINT8) {
             throw new Error("requested password length is too long");
         }
 
         let password = "";
 
-        // randomly select  number of lower case letters, upper case letters and digits such that atleast one from each
-        // group exists in the password.
+        // randomly select number of lower case letters, upper case letters, digits and special characters such that min length constraints
+        // are maintained.
 
-        let lengthLower = this._randomIndex(length - 3) + 1;
-        let lengthUpper = this._randomIndex(length - lengthLower - 2) + 1;
-        let lengthDigit = this._randomIndex(length - lengthLower - lengthUpper - 2) + 1;
+        // below code can be refactored
+        let lengthLower = this._randomIndex(length - minLengthLower - minLengthUpper - minLengthDigit - minLengthSpecial) + minLengthLower;
+        let lengthUpper = this._randomIndex(length - lengthLower - minLengthUpper - minLengthDigit - minLengthSpecial) + minLengthUpper;
+        let lengthDigit = this._randomIndex(length - lengthLower - lengthUpper - minLengthDigit - minLengthSpecial) + minLengthDigit;
         let lengthSpecial = length - lengthLower - lengthUpper - lengthDigit;
+        //
 
         let lengthOfRequiredCharacterSets = [lengthLower, lengthUpper, lengthDigit, lengthSpecial];
 
+        console.log(lengthOfRequiredCharacterSets);
 
         for (const [idx, charSetString] of REQUIRED_CHARACTER_SETS.entries()) {
             while (lengthOfRequiredCharacterSets[idx]--) {
@@ -72,10 +94,13 @@ export const passwordGenerator = {
     /**
      * 
      * @param {number} range The range to generate number in
-     * @returns a random number in the range [0,range)
+     * @returns a random number in the range [0,range) and 0 if range == 0
      * @throws Error if 'range' cannot fit in uint8
      */
     _randomIndex(range) {
+
+        if (range <= 0) return 0;
+
         if (range > MAX_UINT8) {
             throw new Error("`range` cannot fit into uint8");
         }
