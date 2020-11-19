@@ -1,8 +1,8 @@
+// import CryptoJS from 'crypto-js';
+
 import { deriveMasterKey } from './generateMasterKey.js';
 import { AESdecrypt, AESencrypt } from './AESUtils.js';
-import CryptoJS from 'crypto-js';
-
-import { passwordGenerator } from './randomGenerator'
+import { passwordGenerator } from './randomGenerator.js'
 
 verifyTests();
 

@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.0.0",
+    "node-localstorage": "^2.1.6"
   },
   "type": "module",
   "devDependencies": {
