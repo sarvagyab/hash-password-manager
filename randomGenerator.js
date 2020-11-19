@@ -34,7 +34,7 @@ export const passwordGenerator = {
      * 
      * 
      */
-    generatePassword(
+    generatePassword: function (
         length = DEFAULT_PASSWORD_LENGTH,
         minLengthLower = 1,
         minLengthUpper = 1,
@@ -48,19 +48,20 @@ export const passwordGenerator = {
         minLengthDigit = Math.max(0, minLengthDigit);
         minLengthSpecial = Math.max(0, minLengthSpecial);
 
-        if (minLengthLower + minLengthUpper + minLengthDigit + minLengthSpecial > length) {
-            throw new Error('minLengthLower + minLengthUpper + minLengthDigit + minLengthSpecial should be less than length')
-        }
 
         if (length === -1) {
             length = DEFAULT_PASSWORD_MIN_LENGTH + this._randomIndex(DEFAULT_PASSWORD_LENGTH - DEFAULT_PASSWORD_MIN_LENGTH + 1)
         }
 
         if (length < DEFAULT_PASSWORD_MIN_LENGTH) {
-            throw new Error("requested password length is too short");
+            throw new Error("Requested password length is too short");
         }
         if (length > MAX_UINT8) {
-            throw new Error("requested password length is too long");
+            throw new Error("Requested password length is too long");
+        }
+
+        if (minLengthLower + minLengthUpper + minLengthDigit + minLengthSpecial > length) {
+            throw new Error('minLengthLower + minLengthUpper + minLengthDigit + minLengthSpecial should be less than length')
         }
 
         let password = "";
@@ -77,7 +78,6 @@ export const passwordGenerator = {
 
         let lengthOfRequiredCharacterSets = [lengthLower, lengthUpper, lengthDigit, lengthSpecial];
 
-        console.log(lengthOfRequiredCharacterSets);
 
         for (const [idx, charSetString] of REQUIRED_CHARACTER_SETS.entries()) {
             while (lengthOfRequiredCharacterSets[idx]--) {
@@ -97,7 +97,7 @@ export const passwordGenerator = {
      * @returns a random number in the range [0,range) and 0 if range == 0
      * @throws Error if 'range' cannot fit in uint8
      */
-    _randomIndex(range) {
+    _randomIndex: function (range) {
 
         if (range <= 0) return 0;
 
@@ -126,7 +126,7 @@ export const passwordGenerator = {
      * @returns shuffled string
      * 
      */
-    _shuffleString(str) {
+    _shuffleString: function (str) {
 
         let arr = Array.from(str);
 
