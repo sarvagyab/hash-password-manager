@@ -16,6 +16,7 @@ export function deriveMasterKey(password = 'development', salt = null){
             iterations: PBKDF2_ITERATIONS
         }
     ).toString(CryptoJS.enc.Hex);
+    salt
     return {
         encryptionKey,
         salt,

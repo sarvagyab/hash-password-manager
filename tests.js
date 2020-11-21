@@ -5,13 +5,15 @@ import { AESdecrypt, AESencrypt } from './AESUtils.js';
 import { passwordGenerator } from './randomGenerator.js'
 
 verifyTests();
+// encryptionKeyAvailability();
 
 // Run Tests for all Functions
 function verifyTests() {
     let working = true;
     working &= deriveMasterKeyTesting();
     working &= AESencryptionTesting();
-    working &= RandomPasswordGeneratorTesting();
+    if (typeof window !== 'undefined' && window !== null)
+        working &= RandomPasswordGeneratorTesting();
     if (working) console.log("All Functions are working correctly");
     else console.log("Something's wrong")
 }
@@ -92,3 +94,7 @@ function RandomPasswordGeneratorTesting() {
     return result;
 }
 
+// function encryptionKeyAvailability() {
+//     setMasterPassword('myNameIsSarvagya');
+//     console.log(getEncryptionKey('myNameIsSarvagya'));
+// }
