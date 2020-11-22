@@ -5,7 +5,7 @@ import { AESdecrypt, AESencrypt } from './AESUtils.js';
 import { passwordGenerator } from './randomGenerator.js';
 import * as Vault from './Vault.js';
 
-// verifyTests();
+verifyTests();
 // encryptionKeyAvailability();
 
 // Run Tests for all Functions
@@ -16,7 +16,7 @@ function verifyTests() {
     working &= masterHashVerification();
     if (typeof window !== 'undefined' && window !== null)
         working &= RandomPasswordGeneratorTesting();
-        
+
     if (working) console.log("All Functions are working correctly");
     else console.log("Something's wrong")
 }
@@ -99,14 +99,12 @@ function RandomPasswordGeneratorTesting() {
 
 function masterHashVerification(){
     setMasterPassword('myNameIsSarvagya');
-    const masterSalt = Vault.getMasterPassword().masterSalt;
-    const result = verifyMasterPassword('myNameIsSarvagya', masterSalt) && (!verifyMasterPassword('myNameIssarvagya', masterSalt))
+    const result = verifyMasterPassword('myNameIsSarvagya') && (!verifyMasterPassword('myNameIssarvagya'))
     if (result) console.log('Master Password Hash Verification - True');
     else console.log('Master Password Hash Verification - False');
 
     return result;
 }
-
 
 // function encryptionKeyAvailability() {
 //     setMasterPassword('myNameIsSarvagya');

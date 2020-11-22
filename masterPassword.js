@@ -39,11 +39,12 @@ export function getDecryptedMasterPassword(){
     return Vault.getDecryptedMasterPassword();
 }
 
-export function verifyMasterPassword(password, salt) {
+export function verifyMasterPassword(password) {
     // To cover if master password is not set and if set, then it is right or not
-    const masterKey = deriveMasterKey(password, salt);
+    const {masterSalt, masterHash} = Vault.getMasterPassword();
+    const masterKey = deriveMasterKey(password, masterSalt);
     const currentHash = generateMAC(password, masterKey.hashKey);
-    if (currentHash === Vault.getMasterPassword().masterHash)
+    if (currentHash === masterHash)
         return true;
     return false;
 }
