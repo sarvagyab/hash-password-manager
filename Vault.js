@@ -8,38 +8,46 @@ if (typeof localStorage === "undefined" || localStorage === null) {
     vault = localStorage;
 }
 
-const setMasterPassword = (cipherText, iv, masterSalt)=>{
+const setMasterPassword = (cipherText, iv, masterSalt, masterHash)=>{
     const vaultData = {};
     vaultData.master_pwd_salt = masterSalt;
     vaultData.encryption_key = cipherText;
     vaultData.encryption_key_iv = iv;
+    vaultData.master_key_hash = masterHash;
     setVaultData(vaultData);
 }
 
 const getMasterPassword = ()=>{
     const vaultData = getVaultData();
     return {
-        encryptionKey: vaultData.encryption_key,
         masterSalt: vaultData.master_pwd_salt,
+        masterHash: vaultData.master_key_hash,
+    }
+}
+
+const getEncryptionKey = ()=>{
+    const vaultData = getVaultData();
+    return {
+        encryptionKey: vaultData.encryption_key,
         encryptionKeyIV: vaultData.encryption_key_iv
     }
 }
 
-const getUnenecryptedMasterPassword = ()=>{
+const getDeecryptedMasterPassword = ()=>{
     const vaultData = getVaultData();
-    const masterPassword = vaultData.unencryptedMasterPassword;
+    const masterPassword = vaultData.DecryptedMasterPassword;
     return masterPassword;
 }
 
-const setUnencryptedMasterPassword = ()=>{
+const setDecryptedMasterPassword = ()=>{
     const vaultData = getVaultData();
-    vaultData.unencryptedMasterPassword = password;
+    vaultData.DecryptedMasterPassword = password;
     setVaultData(vaultData);
 }
 
-const deleteUnencryptedMasterPassword = ()=>{
+const deleteDecryptedMasterPassword = ()=>{
     const vaultData = getVaultData();
-    delete vaultData["unencryptedMasterPassword"];
+    delete vaultData["DecryptedMasterPassword"];
     setVaultData(vaultData);
 }
 
@@ -86,10 +94,11 @@ export {
     setMasterPassword, 
     getMasterPassword, 
     addPasswordForWebsite, 
-    getUnenecryptedMasterPassword, 
-    deleteUnencryptedMasterPassword, 
-    setUnencryptedMasterPassword,
+    getDeecryptedMasterPassword, 
+    deleteDecryptedMasterPassword, 
+    setDecryptedMasterPassword,
     deleteSavedPassword,
     getUsernamesForWebsite,
     getPasswordForWebsite,
+    getEncryptionKey,
 };
