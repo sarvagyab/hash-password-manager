@@ -7,7 +7,7 @@ const PBKDF2_KEY_SIZE_IN_BITS = 512;
 const PBKDF2_ITERATIONS = 100203;
 
 export function generatePBK(password, salt = null){
-    salt = salt || CryptoJS.lib.WordArray.random(PBKDF2_KEY_SIZE_IN_BITS / 8).toString(CryptoJS.enc.Hex); // Creating a 512 bit/ 64 bytes salt (Salt size is ideally equal to keysize)
+    salt = salt || CryptoJS.lib.WordArray.random(PBKDF2_KEY_SIZE_IN_BITS / 8).toString(CryptoJS.enc.Hex); // Creating a (512 bit / 64 bytes) salt (Salt size is ideally equal to keysize)
     const key = CryptoJS.PBKDF2(
         password, 
         CryptoJS.enc.Hex.parse(salt), 
@@ -25,6 +25,10 @@ export function generatePBK(password, salt = null){
 export function generateMAC(text, key){
     const hash = CryptoJS.HmacSHA256(text, key).toString(CryptoJS.enc.Hex);
     return hash;
+}
+
+export function generateRandomAESencryptionKey() {
+
 }
 
 

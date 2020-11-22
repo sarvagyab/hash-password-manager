@@ -1,12 +1,14 @@
-import * as LOCAL_STORAGE from 'node-localstorage';
-const { LocalStorage } = LOCAL_STORAGE.default;
+// import * as LOCAL_STORAGE from 'node-localstorage';
+// const { LocalStorage } = LOCAL_STORAGE.default;
 
-let vault = null;
-if (typeof localStorage === "undefined" || localStorage === null) {
-    vault = new LocalStorage('./scratch');
-} else {
-    vault = localStorage;
-}
+// let vault = null;
+// if (typeof localStorage === "undefined" || localStorage === null) {
+//     vault = new LocalStorage('./scratch');
+// } else {
+//     vault = localStorage;
+// }
+
+vault = localStorage;
 
 const setMasterPassword = (cipherText, iv, masterSalt, masterHash)=>{
     const vaultData = {};
@@ -33,7 +35,7 @@ const getEncryptionKey = ()=>{
     }
 }
 
-const getDeecryptedMasterPassword = ()=>{
+const getDecryptedMasterPassword = ()=>{
     const vaultData = getVaultData();
     const masterPassword = vaultData.DecryptedMasterPassword;
     return masterPassword;
@@ -94,7 +96,7 @@ export {
     setMasterPassword, 
     getMasterPassword, 
     addPasswordForWebsite, 
-    getDeecryptedMasterPassword, 
+    getDecryptedMasterPassword, 
     deleteDecryptedMasterPassword, 
     setDecryptedMasterPassword,
     deleteSavedPassword,
