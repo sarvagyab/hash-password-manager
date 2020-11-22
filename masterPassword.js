@@ -26,7 +26,7 @@ export function setMasterPassword(password){
 
 export function askForMasterPassword() {
     const masterPassword = Vault.getDecryptedMasterPassword();
-    if (masterPassword === undefined || masterPassword === null)
+    if (typeof masterPassword === 'undefined' || masterPassword === null)
         return true;
     else return false;
 }
@@ -53,6 +53,12 @@ export function verifyMasterPasswordWithKey(password, hashKey) {
     if (currentHash === Vault.getMasterPassword().master_key_hash)
         return true;
     return false;
+}
+
+export function checkMasterPasswordPresent() {
+    const val = Vault.getMasterPassword();
+    if (typeof val === 'undefined' || val === null || typeof val.masterSalt === 'undefined' || val.masterSalt === null || typeof val.masterHash === 'undefined' || val.masterHash === null) return false;
+    return true;
 }
 
 // Not to be used before verification mechanisms are added

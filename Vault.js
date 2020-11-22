@@ -66,7 +66,7 @@ const getPasswordForWebsite = (url, index)=>{
 const addPasswordForWebsite = (details)=>{
     const vaultData = getVaultData();
     const urlPasswords = vaultData[`${details.url}`];
-    if (urlPasswords === undefined || urlPasswords === null)
+    if (typeof urlPasswords === 'undefined' || urlPasswords === null)
         urlPasswords = [];
     urlPasswords.push({username: details.username, password: details.password, iv: details.iv});
     setVaultData(vaultData);
