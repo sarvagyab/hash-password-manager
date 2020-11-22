@@ -63,9 +63,14 @@ export function checkMasterPasswordPresent() {
 }
 
 // Not to be used before verification mechanisms are added
-// function changeMasterPassword(oldPassword, newPassword){
-//     changeMasterPassword(oldPassword)
-// }
+export function changeMasterPassword(oldPassword, newPassword){
+    const ekey = getEncryptionKey(oldPassword);
+    if (ekey === false)return false;
+    const masterKey = deriveMasterKey(newPassword);
+    const masterKeyHash = generateMAC(newPassword, masterKey.hashKey);
+    const encryptedEncryptionKey = AESencrypt(ekey, masterKey.encryptionKey);
+    Vault.setMasterPassword(encryptedEncryptionKey.cipherText, encryptedEncryptionKey.iv, masterKey.salt, masterKeyHash);
+}
 
 export function getEncryptionKey(password){
     const masterPassword = Vault.getMasterPassword();
