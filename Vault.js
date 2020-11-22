@@ -8,7 +8,7 @@
 //     vault = localStorage;
 // }
 
-vault = localStorage;
+let vault = localStorage;
 
 const setMasterPassword = (cipherText, iv, masterSalt, masterHash)=>{
     const vaultData = {};
@@ -84,7 +84,7 @@ const deleteSavedPassword = (url, index) => {
 const getVaultData = ()=>{
     const data = vault.getItem('HASH_PASSWORD_MANAGER');
     const vaultData = JSON.parse(data);
-    return vaultData;
+    return vaultData || {};
 }
 
 const setVaultData = (data)=>{
