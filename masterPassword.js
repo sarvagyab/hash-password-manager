@@ -26,7 +26,9 @@ export function setMasterPassword(password) {
 
 export function askForMasterPassword() {
   const masterPassword = Vault.getDecryptedMasterPassword();
-  if (typeof masterPassword === 'undefined' || masterPassword === null) return true;
+  if (typeof masterPassword === 'undefined' || masterPassword === null) {
+    return true;
+  }
   return false;
 }
 
@@ -40,16 +42,15 @@ export function getDecryptedMasterPassword() {
 
 export function verifyMasterPassword(password) {
   // To cover if master password is not set and if set, then it is right or not
-  const { masterSalt, masterHash } = Vault.getMasterPassword();
+  const { masterSalt } = Vault.getMasterPassword();
   const masterKey = deriveMasterKey(password, masterSalt);
-  const currentHash = generateMAC(password, masterKey.hashKey);
-  if (currentHash === masterHash) return true;
-  return false;
+  return verifyMasterPasswordWithKey(password, masterKey.hashKey);
 }
 
 export function verifyMasterPasswordWithKey(password, hashKey) {
+  const { masterHash } = Vault.getMasterPassword();
   const currentHash = generateMAC(password, hashKey);
-  if (currentHash === Vault.getMasterPassword().master_key_hash) return true;
+  if (currentHash === masterHash) { return true; }
   return false;
 }
 
@@ -60,16 +61,13 @@ export function checkMasterPasswordPresent() {
     || typeof val.masterSalt === 'undefined'
     || val.masterSalt === null || typeof val.masterHash === 'undefined'
     || val.masterHash === null
-  ) {
-    return false;
-  }
+  ) { return false; }
   return true;
 }
 
-// Not to be used before verification mechanisms are added
 export function changeMasterPassword(oldPassword, newPassword) {
   const ekey = getEncryptionKey(oldPassword);
-  if (ekey === false) return false;
+  if (ekey === false) { return false; }
   const masterKey = deriveMasterKey(newPassword);
   const masterKeyHash = generateMAC(newPassword, masterKey.hashKey);
   const encryptedEncryptionKey = AESencrypt(ekey, masterKey.encryptionKey);
@@ -83,11 +81,9 @@ export function changeMasterPassword(oldPassword, newPassword) {
 }
 
 export function getEncryptionKey(password) {
-  const masterPassword = Vault.getMasterPassword();
-  const unlockKey = deriveMasterKey(password, masterPassword.masterSalt);
-  if (!verifyMasterPasswordWithKey(password, unlockKey.hashKey)) {
-    return false;
-  }
+  const { masterSalt } = Vault.getMasterPassword();
+  const unlockKey = deriveMasterKey(password, masterSalt);
+  if (!verifyMasterPasswordWithKey(password, unlockKey.hashKey)) { return false; }
   const encryptionKey = Vault.getEncryptionKey();
   const encryptedEncryptionKey = encryptionKey.encryptionKey;
   const decryptedEncryptionKey = AESdecrypt(

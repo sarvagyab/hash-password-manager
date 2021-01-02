@@ -1,9 +1,8 @@
 import CryptoJS from 'crypto-js';
-
-const AES_KEY_SIZE = 256;
+import * as Constants from './Constants.js';
 
 export function AESencrypt(plainText, key) {
-  const iv = CryptoJS.lib.WordArray.random(AES_KEY_SIZE / 8);
+  const iv = CryptoJS.lib.WordArray.random(Constants.AES_KEY_SIZE / 8);
   const parsedKey = CryptoJS.enc.Hex.parse(key);
   const encryptedText = CryptoJS.AES.encrypt(
     plainText,

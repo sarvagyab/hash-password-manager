@@ -17,6 +17,7 @@
   "rules": {
     "no-use-before-define": ["error", { "functions" : false } ],
     "import/extensions": [2, "ignorePackages"],
-    "max-len": ["error", { "code": 100 }]
+    "max-len": ["error", { "code": 100 }],
+    "curly": ["error", "all"]
   }
 }
