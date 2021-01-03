@@ -1,15 +1,4 @@
-import * as LOCAL_STORAGE from 'node-localstorage';
-
-const { LocalStorage } = LOCAL_STORAGE.default;
-
-let vault = null;
-if (typeof localStorage === 'undefined' || localStorage === null) {
-  vault = new LocalStorage('./scratch');
-} else {
-  vault = localStorage;
-}
-
-// const vault = localStorage;
+const vault = localStorage;
 
 const setMasterPassword = (cipherText, iv, masterSalt, masterHash) => {
   const vaultData = {};
@@ -69,7 +58,9 @@ const getPasswordForWebsite = (url, index) => {
 const addPasswordForWebsite = (details) => {
   const vaultData = getVaultData();
   const urlPasswords = vaultData[`${details.url}`] || [];
-  urlPasswords.push({ username: details.username, password: details.password, iv: details.iv });
+  urlPasswords.push({
+    username: details.username, password: details.password, iv: details.iv, created_at: new Date(),
+  });
   setVaultData(vaultData);
 };
 
