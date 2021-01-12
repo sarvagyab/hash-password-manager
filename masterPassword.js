@@ -1,6 +1,5 @@
 import { generatePBK, generateMAC } from './generators.js';
 import { AESdecrypt, AESencrypt } from './AESUtils.js';
-import * as Vault from './Vault.js';
 
 export function deriveMasterKey(password = 'development', salt = null) {
   const key = generatePBK(password, salt);
@@ -16,80 +15,65 @@ export function setMasterPassword(password) {
   const randomPassword = 'adfsdfuwhfwemfdf';
   const encryptionKey = deriveMasterKey(randomPassword);
   // Encryption Key that will be used to encrypt all passwords
-  const masterKey = deriveMasterKey(password);
-  const masterKeyHash = generateMAC(password, masterKey.hashKey);
-  const encryptedEncryptionKey = AESencrypt(encryptionKey.encryptionKey, masterKey.encryptionKey);
-  Vault.setMasterPassword(
-    encryptedEncryptionKey.cipherText, encryptedEncryptionKey.iv, masterKey.salt, masterKeyHash,
+  const masterPasswordObject = getMasterPassword(
+    password,
+    encryptionKey.encryptionKey,
   );
+  return masterPasswordObject;
 }
 
-export function askForMasterPassword() {
-  const masterPassword = Vault.getDecryptedMasterPassword();
-  if (typeof masterPassword === 'undefined' || masterPassword === null) {
-    return true;
-  }
-  return false;
+export function verifyMasterPassword(_masterKeyObject, password) {
+  const { masterKeySalt, masterKeyHash } = _masterKeyObject;
+  const masterKey = deriveMasterKey(password, masterKeySalt);
+  return verifyMasterPasswordWithKey(masterKeyHash, password, masterKey.hashKey);
 }
 
-export function setAskForMasterPassword() {
-  Vault.deleteDecryptedMasterPassword();
-}
-
-export function getDecryptedMasterPassword() {
-  return Vault.getDecryptedMasterPassword();
-}
-
-export function verifyMasterPassword(password) {
-  // To cover if master password is not set and if set, then it is right or not
-  const { masterSalt } = Vault.getMasterPassword();
-  const masterKey = deriveMasterKey(password, masterSalt);
-  return verifyMasterPasswordWithKey(password, masterKey.hashKey);
-}
-
-export function verifyMasterPasswordWithKey(password, hashKey) {
-  const { masterHash } = Vault.getMasterPassword();
+export function verifyMasterPasswordWithKey(masterKeyHash, password, hashKey) {
   const currentHash = generateMAC(password, hashKey);
-  if (currentHash === masterHash) { return true; }
+  if (currentHash === masterKeyHash) { return true; }
   return false;
 }
 
-export function checkMasterPasswordPresent() {
-  const val = Vault.getMasterPassword();
-  if (
-    typeof val === 'undefined' || val === null
-    || typeof val.masterSalt === 'undefined'
-    || val.masterSalt === null || typeof val.masterHash === 'undefined'
-    || val.masterHash === null
-  ) { return false; }
-  return true;
-}
-
-export function changeMasterPassword(oldPassword, newPassword) {
-  const ekey = getEncryptionKey(oldPassword);
+export function changeMasterPassword(
+  _masterPasswordObject,
+  _encryptionKeyObject,
+  oldPassword,
+  newPassword,
+) {
+  const ekey = getEncryptionKey(_masterPasswordObject, _encryptionKeyObject, oldPassword);
   if (ekey === false) { return false; }
-  const masterKey = deriveMasterKey(newPassword);
-  const masterKeyHash = generateMAC(newPassword, masterKey.hashKey);
-  const encryptedEncryptionKey = AESencrypt(ekey, masterKey.encryptionKey);
-  Vault.setMasterPassword(
-    encryptedEncryptionKey.cipherText,
-    encryptedEncryptionKey.iv,
-    masterKey.salt,
-    masterKeyHash,
+  const newMasterPasswordObject = getMasterPassword(
+    newPassword,
+    ekey,
   );
-  return true;
+  return newMasterPasswordObject;
 }
 
-export function getEncryptionKey(password) {
-  const { masterSalt } = Vault.getMasterPassword();
-  const unlockKey = deriveMasterKey(password, masterSalt);
-  if (!verifyMasterPasswordWithKey(password, unlockKey.hashKey)) { return false; }
-  const encryptionKey = Vault.getEncryptionKey();
-  const encryptedEncryptionKey = encryptionKey.encryptionKey;
+export function getEncryptionKey(_masterPasswordObject, _encryptionKeyObject, password) {
+  const { masterKeySalt, masterKeyHash } = _masterPasswordObject;
+  const { encryptionKey, encryptionKeyIv } = _encryptionKeyObject;
+  const unlockKey = deriveMasterKey(password, masterKeySalt);
+  if (!verifyMasterPasswordWithKey(
+    masterKeyHash,
+    password,
+    unlockKey.hashKey,
+  )) { return false; }
   const decryptedEncryptionKey = AESdecrypt(
-    encryptedEncryptionKey,
+    encryptionKey,
     unlockKey.encryptionKey,
-    encryptionKey.encryptionKeyIV,
+    encryptionKeyIv,
   );
   return decryptedEncryptionKey;
+}
+
+function getMasterPassword(password, encryptionKey) {
+  const masterKey = deriveMasterKey(password);
+  const masterKeyHash = generateMAC(password, masterKey.hashKey);
+  const encryptedEncryptionKey = AESencrypt(encryptionKey, masterKey.encryptionKey);
+  return ({
+    encryptionKey: encryptedEncryptionKey.cipherText,
+    encryptionKeyIv: encryptedEncryptionKey.iv,
+    masterKeySalt: masterKey.salt,
+    masterKeyHash,
+  });
 }

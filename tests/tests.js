@@ -2,11 +2,10 @@
 // import CryptoJS from 'crypto-js';
 
 import {
-  deriveMasterKey, setMasterPassword, verifyMasterPassword, verifyMasterPasswordWithKey,
-} from './masterPassword.js';
-import { AESdecrypt, AESencrypt } from './AESUtils.js';
-import { passwordGenerator } from './randomGenerator.js';
-import * as Vault from './Vault.js';
+  deriveMasterKey, setMasterPassword, verifyMasterPassword, changeMasterPassword,
+} from '../masterPassword.js';
+import { AESdecrypt, AESencrypt } from '../AESUtils.js';
+import { passwordGenerator } from '../randomGenerator.js';
 
 verifyTests();
 // encryptionKeyAvailability();
@@ -15,14 +14,16 @@ verifyTests();
 function verifyTests() {
   let working = true;
   working = working && deriveMasterKeyTesting();
-  working = working && AesEncryptionTesting();
   working = working && masterHashVerification();
-  if (typeof window !== 'undefined' && window !== null) {
-    working = working && RandomPasswordGeneratorTesting();
-  }
+  working = working && changeMasterPasswordVerification();
+  // working = working && AesEncryptionTesting();
+  // if (typeof window !== 'undefined' && window !== null) {
+  //   working = working && RandomPasswordGeneratorTesting();
+  // }
 
-  if (working) console.log('All Functions are working correctly');
-  else console.log("Something's wrong");
+  if (working) {
+    console.log('All Functions are working correctly');
+  } else { console.log("Something's wrong"); }
 }
 
 // Testing deriveMasterKey
@@ -33,8 +34,48 @@ function deriveMasterKeyTesting() {
   const result = (masterKey.encryptionKey === verifyKey.encryptionKey)
     && (masterKey.salt === verifyKey.salt);
 
-  if (result) console.log('deriveMasterKey - True');
-  else console.log('deriveMasterKey - False');
+  if (result) {
+    console.log('deriveMasterKey - True');
+  } else { console.log('deriveMasterKey - False'); }
+  return result;
+}
+
+// Testing verification of masterKey
+function masterHashVerification() {
+  const masterKeyObject = setMasterPassword('myNameIsSarvagya');
+  const result = verifyMasterPassword(masterKeyObject, 'myNameIsSarvagya')
+    && (!verifyMasterPassword(masterKeyObject, 'myNameIssarvagya'));
+  if (result) {
+    console.log('Master Password Hash Verification - True');
+  } else { console.log('Master Password Hash Verification - False'); }
+
+  return result;
+}
+
+// Testing changing of MasterPasswordFunctionality
+function changeMasterPasswordVerification() {
+  const masterPasswordObject = setMasterPassword('myNameIsSarvagya');
+  const { masterKeyHash, masterKeySalt } = masterPasswordObject;
+  const { encryptionKey, encryptionKeyIv } = masterPasswordObject;
+  const masterKeyObject = { masterKeyHash, masterKeySalt };
+  const encryptionkeyObject = { encryptionKey, encryptionKeyIv };
+  let result = changeMasterPassword(
+    masterKeyObject,
+    encryptionkeyObject,
+    'myNameIsSarvagya',
+    'myNameIsStillSarvagya',
+  );
+  if (result !== false) {
+    const newMasterKeyObject = {
+      masterKeySalt: result.masterKeySalt,
+      masterKeyHash: result.masterKeyHash,
+    };
+    result = verifyMasterPassword(newMasterKeyObject, 'myNameIsStillSarvagya')
+      && !verifyMasterPassword(newMasterKeyObject, 'myNameIsSarvagya');
+  }
+  if (result) {
+    console.log('Change Master Password Verification - True');
+  } else { console.log('Change Master Password Verification - False'); }
   return result;
 }
 
@@ -46,8 +87,7 @@ function AesEncryptionTesting() {
   const encrypted = AESencrypt(passphrase, encryptedKey);
   const decrytped = AESdecrypt(encrypted.cipherText, encryptedKey, encrypted.iv);
   const result = (passphrase === decrytped);
-  if (result) console.log('AESencrypt/AESdecrypt - True');
-  else console.log('AESencrypt/AESdecrypt - False');
+  if (result) { console.log('AESencrypt/AESdecrypt - True'); } else { console.log('AESencrypt/AESdecrypt - False'); }
   return result;
 }
 
@@ -63,10 +103,7 @@ function RandomPasswordGeneratorTesting() {
     let LL = 0; let LU = 0; let LS = 0; let
       LD = 0;
     for (const ch of str) {
-      if (LOWER_CASE.indexOf(ch) != -1) ++LL;
-      else if (UPPER_CASE.indexOf(ch) != -1) ++LU;
-      else if (DIGITS.indexOf(ch) != -1) ++LD;
-      else if (SPECIAL_CASE.indexOf(ch) != -1) ++LS;
+      if (LOWER_CASE.indexOf(ch) != -1) { ++LL; } else if (UPPER_CASE.indexOf(ch) != -1) { ++LU; } else if (DIGITS.indexOf(ch) != -1) { ++LD; } else if (SPECIAL_CASE.indexOf(ch) != -1) { ++LS; }
     }
     return [LL, LU, LD, LS];
   };
@@ -95,20 +132,13 @@ function RandomPasswordGeneratorTesting() {
   result &= _checkError(passwordGenerator.generatePassword, 'Requested password length is too short', 2);
   result &= _checkError(passwordGenerator.generatePassword, 'minLengthLower + minLengthUpper + minLengthDigit + minLengthSpecial should be less than length', 10, 3, 4, 10, 3);
 
-  if (result) console.log('Random Password Generation - True');
-  else console.log('Random Password Generation - False');
+  if (result) { console.log('Random Password Generation - True'); } else { console.log('Random Password Generation - False'); }
 
   return result;
 }
 
-function masterHashVerification() {
-  setMasterPassword('myNameIsSarvagya');
-  const result = verifyMasterPassword('myNameIsSarvagya')
-    && (!verifyMasterPassword('myNameIssarvagya'));
-  if (result) console.log('Master Password Hash Verification - True');
-  else console.log('Master Password Hash Verification - False');
+function addPasswordVerification() {
 
-  return result;
 }
 
 // function encryptionKeyAvailability() {
