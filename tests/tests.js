@@ -1,119 +1,34 @@
 /* eslint-disable no-console */
-// import CryptoJS from 'crypto-js';
+import { passwordGenerator } from '../randomGenerator.js';
 
 import {
-  deriveMasterKey, setMasterPassword, verifyMasterPassword, changeMasterPassword,
-} from '../masterPassword.js';
-import { AESdecrypt, AESencrypt } from '../AESUtils.js';
-import { passwordGenerator } from '../randomGenerator.js';
-import { decryptLoginPassword, encryptLoginPassword } from '../passwordControl.js';
+  deriveMasterKeyTesting,
+  masterHashVerification,
+  changeMasterPasswordTesting,
+} from './masterPassword.js';
+
+import {
+  AesEncryptionTesting,
+  loginPasswordEncryptionTesting,
+} from './loginPassword.js';
 
 verifyTests();
-// encryptionKeyAvailability();
 
 // Run Tests for all Functions
 function verifyTests() {
   let working = true;
   working = working && deriveMasterKeyTesting();
   working = working && masterHashVerification();
-  working = working && changeMasterPasswordVerification();
+  working = working && changeMasterPasswordTesting();
   working = working && AesEncryptionTesting();
   working = working && loginPasswordEncryptionTesting();
-  // if (typeof window !== 'undefined' && window !== null) {
-  //   working = working && RandomPasswordGeneratorTesting();
-  // }
+  if (typeof window !== 'undefined' && window !== null) {
+    working = working && RandomPasswordGeneratorTesting();
+  }
 
   if (working) {
     console.log('All Functions are working correctly');
   } else { console.log("Something's wrong"); }
-}
-
-// Testing deriveMasterKey
-function deriveMasterKeyTesting() {
-  const password = 'myNameIsSarvagya';
-  const masterKey = deriveMasterKey(password);
-  const verifyKey = deriveMasterKey(password, masterKey.salt);
-  const result = (masterKey.encryptionKey === verifyKey.encryptionKey)
-    && (masterKey.salt === verifyKey.salt);
-
-  if (result) {
-    console.log('deriveMasterKey - True');
-  } else { console.log('deriveMasterKey - False'); }
-  return result;
-}
-
-// Testing verification of masterKey
-function masterHashVerification() {
-  const masterKeyObject = setMasterPassword('myNameIsSarvagya');
-  const result = verifyMasterPassword(masterKeyObject, 'myNameIsSarvagya')
-    && (!verifyMasterPassword(masterKeyObject, 'myNameIssarvagya'));
-  if (result) {
-    console.log('Master Password Hash Verification - True');
-  } else { console.log('Master Password Hash Verification - False'); }
-
-  return result;
-}
-
-// Testing changing of MasterPasswordFunctionality
-function changeMasterPasswordVerification() {
-  const masterPasswordObject = setMasterPassword('myNameIsSarvagya');
-  const { masterKeyHash, masterKeySalt } = masterPasswordObject;
-  const { encryptionKey, encryptionKeyIv } = masterPasswordObject;
-  const masterKeyObject = { masterKeyHash, masterKeySalt };
-  const encryptionkeyObject = { encryptionKey, encryptionKeyIv };
-  let result = changeMasterPassword(
-    masterKeyObject,
-    encryptionkeyObject,
-    'myNameIsSarvagya',
-    'myNameIsStillSarvagya',
-  );
-  if (result !== false) {
-    const newMasterKeyObject = {
-      masterKeySalt: result.masterKeySalt,
-      masterKeyHash: result.masterKeyHash,
-    };
-    result = verifyMasterPassword(newMasterKeyObject, 'myNameIsStillSarvagya')
-      && !verifyMasterPassword(newMasterKeyObject, 'myNameIsSarvagya');
-  }
-  if (result) {
-    console.log('Change Master Password Verification - True');
-  } else { console.log('Change Master Password Verification - False'); }
-  return result;
-}
-
-// Testing AES encrypt decrypt functions
-function AesEncryptionTesting() {
-  const passphrase = 'Loreum Ipsum';
-  const masterKey = deriveMasterKey('myNameIsSarvagya');
-  const encryptedKey = masterKey.encryptionKey;
-  const encrypted = AESencrypt(passphrase, encryptedKey);
-  const decrytped = AESdecrypt(encrypted.cipherText, encryptedKey, encrypted.iv);
-  const result = (passphrase === decrytped);
-  if (result) {
-    console.log('AESencrypt/AESdecrypt - True');
-  } else { console.log('AESencrypt/AESdecrypt - False'); }
-  return result;
-}
-
-// Testing encyrption decryption of passwords
-function loginPasswordEncryptionTesting() {
-  const masterPasswordObject = setMasterPassword('myNameIsSarvagya');
-  const { masterKeyHash, masterKeySalt } = masterPasswordObject;
-  const { encryptionKey, encryptionKeyIv } = masterPasswordObject;
-  const masterKeyObject = { masterKeyHash, masterKeySalt };
-  const encryptionkeyObject = { encryptionKey, encryptionKeyIv };
-  const loginPassword = 'tismyloginpassword';
-  const encryptedPassword = encryptLoginPassword(
-    masterKeyObject, encryptionkeyObject, 'myNameIsSarvagya', loginPassword,
-  );
-  const decryptedPassword = decryptLoginPassword(
-    masterKeyObject, encryptionkeyObject, 'myNameIsSarvagya', encryptedPassword,
-  );
-  const result = (decryptedPassword === loginPassword);
-  if (result) {
-    console.log('Login Password Encryption Working - True');
-  } else { console.log('Login Password Encryption Working - False'); }
-  return result;
 }
 
 // Testing random password generator
