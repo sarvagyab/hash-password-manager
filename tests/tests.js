@@ -6,6 +6,7 @@ import {
 } from '../masterPassword.js';
 import { AESdecrypt, AESencrypt } from '../AESUtils.js';
 import { passwordGenerator } from '../randomGenerator.js';
+import { decryptLoginPassword, encryptLoginPassword } from '../passwordControl.js';
 
 verifyTests();
 // encryptionKeyAvailability();
@@ -16,7 +17,8 @@ function verifyTests() {
   working = working && deriveMasterKeyTesting();
   working = working && masterHashVerification();
   working = working && changeMasterPasswordVerification();
-  // working = working && AesEncryptionTesting();
+  working = working && AesEncryptionTesting();
+  working = working && loginPasswordEncryptionTesting();
   // if (typeof window !== 'undefined' && window !== null) {
   //   working = working && RandomPasswordGeneratorTesting();
   // }
@@ -79,15 +81,38 @@ function changeMasterPasswordVerification() {
   return result;
 }
 
-// Testing AESencrypt decrypt functions
+// Testing AES encrypt decrypt functions
 function AesEncryptionTesting() {
   const passphrase = 'Loreum Ipsum';
   const masterKey = deriveMasterKey('myNameIsSarvagya');
-  const encryptedKey = masterKey.encryptionKey.substr(0, masterKey.encryptionKey.length / 2);
+  const encryptedKey = masterKey.encryptionKey;
   const encrypted = AESencrypt(passphrase, encryptedKey);
   const decrytped = AESdecrypt(encrypted.cipherText, encryptedKey, encrypted.iv);
   const result = (passphrase === decrytped);
-  if (result) { console.log('AESencrypt/AESdecrypt - True'); } else { console.log('AESencrypt/AESdecrypt - False'); }
+  if (result) {
+    console.log('AESencrypt/AESdecrypt - True');
+  } else { console.log('AESencrypt/AESdecrypt - False'); }
+  return result;
+}
+
+// Testing encyrption decryption of passwords
+function loginPasswordEncryptionTesting() {
+  const masterPasswordObject = setMasterPassword('myNameIsSarvagya');
+  const { masterKeyHash, masterKeySalt } = masterPasswordObject;
+  const { encryptionKey, encryptionKeyIv } = masterPasswordObject;
+  const masterKeyObject = { masterKeyHash, masterKeySalt };
+  const encryptionkeyObject = { encryptionKey, encryptionKeyIv };
+  const loginPassword = 'tismyloginpassword';
+  const encryptedPassword = encryptLoginPassword(
+    masterKeyObject, encryptionkeyObject, 'myNameIsSarvagya', loginPassword,
+  );
+  const decryptedPassword = decryptLoginPassword(
+    masterKeyObject, encryptionkeyObject, 'myNameIsSarvagya', encryptedPassword,
+  );
+  const result = (decryptedPassword === loginPassword);
+  if (result) {
+    console.log('Login Password Encryption Working - True');
+  } else { console.log('Login Password Encryption Working - False'); }
   return result;
 }
 
@@ -136,12 +161,3 @@ function RandomPasswordGeneratorTesting() {
 
   return result;
 }
-
-function addPasswordVerification() {
-
-}
-
-// function encryptionKeyAvailability() {
-//     setMasterPassword('myNameIsSarvagya');
-//     console.log(getEncryptionKey('myNameIsSarvagya'));
-// }
