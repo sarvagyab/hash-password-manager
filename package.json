@@ -4,7 +4,7 @@
   "description": "",
   "main": "generateMasterKey.js",
   "scripts": {
-    "test": "node -r node-localstorage/register tests.js",
+    "test": "node -r node-localstorage/register ./tests/tests.js",
     "lint": "eslint . --ext .js --ext .ts"
   },
   "author": "",
