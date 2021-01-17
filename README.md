@@ -1,7 +1,6 @@
 
-# Password Management Library
-A general purpose library which provides industry standards defaults and easily extensible
-
+# Password Handling Library for Password Managers
+A general purpose library which uses industry standard defaults and is easily extensible to use different security measures as per user requirements.
 
 # API
 
@@ -19,10 +18,7 @@ A general purpose library which provides industry standards defaults and easily 
 | Function | Output |
 | --- | --- |
 | `setMasterPassword(password:string)` | masterPasswordObject |
-| `getMasterPassword(password:string, encryptionKey:string)` | masterPasswordObject |
 | `verifyMasterPassword(masterKeyObject, password:string)` | boolean |
-| `verifyMasterPasswordWithKey(masterKeyHash:string, password:string, hashKey:string)` | boolean |
 | `changeMasterPassword(masterPasswordObject, encryptionKeyObject, oldPassword:string, newPassword:string)` | masterPasswordObject |
-| `getEncryptionKey(masterPasswordObject, encryptionKeyObject, password:string)` | decryptedEncryptionKey:string |
 | `encryptLoginPassword(masterPasswordObject, encryptionKeyObject, masterPassword:string, loginPassword:string)` | encryptedLoginPassword:encryptionKeyObject|
 | `decryptLoginPassword(masterPasswordObject, encryptionKeyObject, masterPassword:string, encryptedLoginPassword:encryptionKeyObject)` | decryptedPassword:string |
