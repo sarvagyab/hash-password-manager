@@ -1,6 +1,4 @@
 /* eslint-disable no-console */
-// import CryptoJS from 'crypto-js';
-
 import {
   deriveMasterKey, setMasterPassword, verifyMasterPassword, changeMasterPassword,
 } from '../masterPassword.js';
