@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.0.0",
+    "zxcvbn": "^4.4.2"
   },
   "type": "module",
   "devDependencies": {

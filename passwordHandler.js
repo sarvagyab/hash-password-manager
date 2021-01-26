@@ -1,10 +1,12 @@
 export {
   setMasterPassword,
   verifyMasterPassword,
+  verifyMasterPasswordWithKey,
   changeMasterPassword,
 } from './masterPassword.js';
 
 export {
   encryptLoginPassword,
   decryptLoginPassword,
-} from './passwordControl.js';
+  checkPasswordStrength,
+} from './passwordUtils.js';

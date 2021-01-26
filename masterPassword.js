@@ -1,7 +1,7 @@
 import { generatePBK, generateMAC } from './generators.js';
 import { AESdecrypt, AESencrypt } from './AESUtils.js';
 
-export function deriveMasterKey(password = 'development', salt = null) {
+function deriveMasterKey(password = 'development', salt = null) {
   const key = generatePBK(password, salt);
   const masterKey = {};
   masterKey.encryptionKey = key.key.substr(0, key.key.length / 2);
@@ -10,7 +10,7 @@ export function deriveMasterKey(password = 'development', salt = null) {
   return masterKey;
 }
 
-export function setMasterPassword(password) {
+function setMasterPassword(password) {
   // const randomPassword = passwordGenerator.generatePassword();
   const randomPassword = 'adfsdfuwhfwemfdf';
   const encryptionKey = deriveMasterKey(randomPassword);
@@ -22,25 +22,31 @@ export function setMasterPassword(password) {
   return masterPasswordObject;
 }
 
-export function verifyMasterPassword(_masterKeyObject, password) {
+function verifyMasterPassword(_masterKeyObject, password) {
   const { masterKeySalt, masterKeyHash } = _masterKeyObject;
   const masterKey = deriveMasterKey(password, masterKeySalt);
   return verifyMasterPasswordWithKey(masterKeyHash, password, masterKey.hashKey);
 }
 
-export function verifyMasterPasswordWithKey(masterKeyHash, password, hashKey) {
+function verifyMasterPasswordWithKey(masterKeyHash, password, hashKey) {
   const currentHash = generateMAC(password, hashKey);
   if (currentHash === masterKeyHash) { return true; }
   return false;
 }
 
-export function changeMasterPassword(
-  _masterPasswordObject,
+function changeMasterPassword(
+  _masterKeyObject,
   _encryptionKeyObject,
   oldPassword,
   newPassword,
+  oldPasswordObject = null,
 ) {
-  const ekey = getEncryptionKey(_masterPasswordObject, _encryptionKeyObject, oldPassword);
+  const ekey = getEncryptionKey(
+    _masterKeyObject,
+    _encryptionKeyObject,
+    oldPassword,
+    oldPasswordObject,
+  );
   if (ekey === false) { return false; }
   const newMasterPasswordObject = getMasterPassword(
     newPassword,
@@ -49,10 +55,15 @@ export function changeMasterPassword(
   return newMasterPasswordObject;
 }
 
-export function getEncryptionKey(_masterPasswordObject, _encryptionKeyObject, password) {
-  const { masterKeySalt, masterKeyHash } = _masterPasswordObject;
+function getEncryptionKey(
+  _masterKeyObject,
+  _encryptionKeyObject,
+  password,
+  passwordObject = null,
+) {
+  const { masterKeySalt, masterKeyHash } = _masterKeyObject;
   const { encryptionKey, encryptionKeyIv } = _encryptionKeyObject;
-  const unlockKey = deriveMasterKey(password, masterKeySalt);
+  const unlockKey = passwordObject || deriveMasterKey(password, masterKeySalt);
   if (!verifyMasterPasswordWithKey(
     masterKeyHash,
     password,
@@ -77,3 +88,12 @@ function getMasterPassword(password, encryptionKey) {
     masterKeyHash,
   });
 }
+
+export {
+  deriveMasterKey,
+  setMasterPassword,
+  verifyMasterPassword,
+  verifyMasterPasswordWithKey,
+  changeMasterPassword,
+  getEncryptionKey,
+};

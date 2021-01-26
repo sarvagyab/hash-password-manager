@@ -19,7 +19,7 @@ function deriveMasterKeyTesting() {
 
 // Testing verification of masterKey
 function masterHashVerification() {
-  const masterKeyObject = setMasterPassword('myNameIsSarvagya');
+  const masterKeyObject = setMasterPassword('myNameIsSarvagya'); // actually masterPasswordObject
   const result = verifyMasterPassword(masterKeyObject, 'myNameIsSarvagya')
     && (!verifyMasterPassword(masterKeyObject, 'myNameIssarvagya'));
   if (result) {
@@ -36,11 +36,13 @@ function changeMasterPasswordTesting() {
   const { encryptionKey, encryptionKeyIv } = masterPasswordObject;
   const masterKeyObject = { masterKeyHash, masterKeySalt };
   const encryptionkeyObject = { encryptionKey, encryptionKeyIv };
+  const passwordKeyObject = deriveMasterKey('myNameIsSarvagya');
   let result = changeMasterPassword(
     masterKeyObject,
     encryptionkeyObject,
     'myNameIsSarvagya',
     'myNameIsStillSarvagya',
+    passwordKeyObject,
   );
   if (result !== false) {
     const newMasterKeyObject = {
