@@ -1,7 +1,8 @@
 import CryptoJS from 'crypto-js';
+import generator from 'generate-password';
 import * as Constants from './Constants.js';
 
-export function generatePBK(password, saltPresent = null) {
+function generatePBK(password, saltPresent = null) {
 // Creating a (512 bit / 64 bytes) salt (Salt size is ideally equal to keysize)
   const salt = saltPresent
     || CryptoJS.lib.WordArray
@@ -20,11 +21,13 @@ export function generatePBK(password, saltPresent = null) {
   };
 }
 
-export function generateMAC(text, key) {
+function generateMAC(text, key) {
   const hash = CryptoJS.HmacSHA256(text, key).toString(CryptoJS.enc.Hex);
   return hash;
 }
 
-export function generateRandomAESencryptionKey() {
-
+function generateRandomString(options) {
+  return generator.generate(options);
 }
+
+export { generatePBK, generateMAC, generateRandomString as generatePassword };

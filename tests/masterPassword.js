@@ -35,11 +35,11 @@ function changeMasterPasswordTesting() {
   const { masterKeyHash, masterKeySalt } = masterPasswordObject;
   const { encryptionKey, encryptionKeyIv } = masterPasswordObject;
   const masterKeyObject = { masterKeyHash, masterKeySalt };
-  const encryptionkeyObject = { encryptionKey, encryptionKeyIv };
-  const passwordKeyObject = deriveMasterKey('myNameIsSarvagya');
+  const encryptionKeyObject = { encryptionKey, encryptionKeyIv };
+  const passwordKeyObject = deriveMasterKey('myNameIsSarvagya', masterKeySalt);
   let result = changeMasterPassword(
     masterKeyObject,
-    encryptionkeyObject,
+    encryptionKeyObject,
     'myNameIsSarvagya',
     'myNameIsStillSarvagya',
     passwordKeyObject,

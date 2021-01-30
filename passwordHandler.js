@@ -1,4 +1,5 @@
 export {
+  deriveMasterKey,
   setMasterPassword,
   verifyMasterPassword,
   verifyMasterPasswordWithKey,
@@ -10,3 +11,7 @@ export {
   decryptLoginPassword,
   checkPasswordStrength,
 } from './passwordUtils.js';
+
+export {
+  generatePassword,
+} from './generators.js';

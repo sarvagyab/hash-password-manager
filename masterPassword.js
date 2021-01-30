@@ -1,4 +1,4 @@
-import { generatePBK, generateMAC } from './generators.js';
+import { generatePBK, generateMAC, generatePassword } from './generators.js';
 import { AESdecrypt, AESencrypt } from './AESUtils.js';
 
 function deriveMasterKey(password = 'development', salt = null) {
@@ -11,10 +11,10 @@ function deriveMasterKey(password = 'development', salt = null) {
 }
 
 function setMasterPassword(password) {
-  // const randomPassword = passwordGenerator.generatePassword();
-  const randomPassword = 'adfsdfuwhfwemfdf';
+  const randomPassword = generatePassword({
+    length: 30, numbers: true, symbols: true, lowercase: true, uppercase: true,
+  });
   const encryptionKey = deriveMasterKey(randomPassword);
-  // Encryption Key that will be used to encrypt all passwords
   const masterPasswordObject = getMasterPassword(
     password,
     encryptionKey.encryptionKey,

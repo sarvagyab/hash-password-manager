@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { deriveMasterKey, setMasterPassword } from '../masterPassword.js';
 import { AESdecrypt, AESencrypt } from '../AESUtils.js';
-import { decryptLoginPassword, encryptLoginPassword } from '../passwordControl.js';
+import { decryptLoginPassword, encryptLoginPassword } from '../passwordUtils.js';
 
 // Testing AES encrypt decrypt functions
 function AesEncryptionTesting() {

@@ -1,4 +1,4 @@
-import { zxcvbn } from 'zxcvbn';
+import ZXCVBN from 'zxcvbn';
 import { AESdecrypt, AESencrypt } from './AESUtils.js';
 import { getEncryptionKey } from './masterPassword.js';
 
@@ -34,5 +34,5 @@ export function decryptLoginPassword(
 }
 
 export function checkPasswordStrength(password) {
-  return zxcvbn(password);
+  return ZXCVBN.zxcvbn(password);
 }
