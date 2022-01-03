@@ -72,7 +72,6 @@ export const passwordGenerator = {
     const lengthUpper = this._randomIndex(length - lengthLower - minLengthUpper - minLengthDigit - minLengthSpecial) + minLengthUpper;
     const lengthDigit = this._randomIndex(length - lengthLower - lengthUpper - minLengthDigit - minLengthSpecial) + minLengthDigit;
     const lengthSpecial = length - lengthLower - lengthUpper - lengthDigit;
-    //
 
     const lengthOfRequiredCharacterSets = [lengthLower, lengthUpper, lengthDigit, lengthSpecial];
 
@@ -106,7 +105,7 @@ export const passwordGenerator = {
 
     const randomValueArr = new Uint16Array(1);
     do {
-      window.crypto.getRandomValues(randomValueArr);
+      crypto.getRandomValues(randomValueArr);
     } while (randomValueArr[0] > MAX_ACCEPTABLE_VALUE);
 
     return randomValueArr[0] % range;

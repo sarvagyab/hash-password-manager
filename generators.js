@@ -26,8 +26,8 @@ function generateMAC(text, key) {
   return hash;
 }
 
-function generateRandomString(options) {
-  return passwordGenerator.generate(options);
+function generateRandomString() {
+  return passwordGenerator.generate();
 }
 
 export { generatePBK, generateMAC, generateRandomString as generatePassword };

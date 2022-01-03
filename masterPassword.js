@@ -11,9 +11,7 @@ function deriveMasterKey(password = 'development', salt = null) {
 }
 
 function setMasterPassword(password) {
-  const randomPassword = generatePassword({
-    length: 30, numbers: true, symbols: true, lowercase: true, uppercase: true,
-  });
+  const randomPassword = generatePassword();
   const encryptionKey = deriveMasterKey(randomPassword);
   const masterPasswordObject = getMasterPassword(
     password,
