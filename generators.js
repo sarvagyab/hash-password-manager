@@ -1,5 +1,5 @@
 import CryptoJS from 'crypto-js';
-import generator from 'generate-password';
+import {passwordGenerator} from './randomGenerator';
 import * as Constants from './Constants.js';
 
 function generatePBK(password, saltPresent = null) {
@@ -27,7 +27,7 @@ function generateMAC(text, key) {
 }
 
 function generateRandomString(options) {
-  return generator.generate(options);
+  return passwordGenerator.generate(options);
 }
 
 export { generatePBK, generateMAC, generateRandomString as generatePassword };
